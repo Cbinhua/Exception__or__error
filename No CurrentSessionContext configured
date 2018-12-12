@@ -1,0 +1,19 @@
+No CurrentSessionContext configured! 
+
+表示：没有CurrentSession上下文配置！ 这就想到了我们在利用CurrentSession的时候，其实就是getCurrentSession的时候没有在hibernate.cfg.xml文件中配置！
+
+
+（3）解释原理：
+1、在 SessionFactory（会话工厂）启动的时候，Hibernate 会根据配置创建相应的 CurrentSessionContext,
+
+在getCurrentSession()被调用的时候，实际被执行的方法是 CurrentSessionContext.currentSession()。
+
+2、这里的“根据配置”就是如下配置:
+
+* 如果使用的是本地事务（jdbc事务 本地事务：数据库只有一个）
+
+<property name="hibernate.current_session_context_class">thread</property>
+* 如果使用的是全局事务（jta事务 全局事务：数据库有多个）
+<property name="hibernate.current_session_context_class">jta</property> 
+（4）所以解决问题的办法就是根据需求在hibernate.cfg.xml文件中加上上边的配置即可！
+
