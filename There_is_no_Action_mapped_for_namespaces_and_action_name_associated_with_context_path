@@ -1,0 +1,39 @@
+问题一： 
+Struts Problem Report 
+Struts has detected an unhandled exception:
+
+Messages: There is no Action mapped for namespace [/] and action name [] associated with context path [/Struts2_0303_Action].
+
+Stacktraces 
+There is no Action mapped for namespace [/] and action name [] associated with context path [/Struts2_0303_Action]. - [unknown location] 
+com.opensymphony.xwork2.DefaultActionProxy.prepare(DefaultActionProxy.java:185) 
+org.apache.struts2.impl.StrutsActionProxy.prepare(StrutsActionProxy.java:63) 
+org.apache.struts2.impl.StrutsActionProxyFactory.createActionProxy(StrutsActionProxyFactory.java:37) 
+com.opensymphony.xwork2.DefaultActionProxyFactory.createActionProxy(DefaultActionProxyFactory.java:58) 
+提示没有找到确切的action 
+这个问题出现的原因有很多，遇到好几次了，现总结如下，网上都说是由于struts.xml和web.xml文件的配置引起的，但是在我反复对比之后发现，即使是两个项目有着同样的配置，还是有可能出问题。 
+总结如下： 
+情况一： 
+多次尝试之后发现，在web.xml 文件中并没有配置下面<welcome-file-list>这个玩意，但是直接run as项目时（此时浏览器的路径直接是http://localhost:8080/Struts2_0303_Action），会报这个错误，在webContent目录下创建一个index.jsp文件之后 ，再次run as 项目就发现不会出现此错误了，直接就能显示出index.jsp页面的内容了。于是带着疑问去查<welcome-file-list>这个标签到底是什么意思。 
+有人说是制定首页 
+比如你写的项目 地址是 127.0.0.1 
+里边有一个也页面 index.jsp 
+如果要访问这个页面的话你要输入 127.0.0.1/index.jsp 
+如果在 <welcome-file-list>里指定了index.jsp为首页的话 
+你只要输入 127.0.0.1 就能直接打开 index.jsp 
+但是在struts2中，只要webContent目录下面包含一个index.jsp文件，无论是在浏览器中输入127.0.0.1/index.jsp还是127.0.0.1都是能正常访问到index.jsp页面的内容的。 
+所以对于下面这个玩意的作用到底是什么，还是不清楚。哪位看官懂的话，指点一下也是极好的。
+
+1<welcome-file-list>
+2   <welcome-file>index.jsp</welcome-file>
+3 </welcome-file-list>
+如果出现这个错误了，并且webContent目录下也不存在index.jsp文件的话，直接在浏览器中输入http://localhost:8080/Struts2_0303_Action（其中Struts2_0303_Action为项目名），会出现题目的错误信息，但是在路径之后加上struts.xml配置文件中的某一个action的名称之后，可以直接显示此action所映射的页面内容。 
+举例说明： 
+如果struts.xml中文件中存在如下配置：
+    
+1<package name="default" namespace="/" extends="struts-default">
+2    <action name="index" class="org.bd.struts2.hello.IndexAction">
+3        <result name="success">/success.jsp</result>
+4    </action>
+5 </package>
+直接在路径之后加上index即可显示出success.jsp页面里面的内容，如果namespace不是斜杠，而是模块中的名称，比如namespace=“/user”,这是就需要在后面添加user/index这样才能显示出success的内容。
